@@ -2,7 +2,6 @@ import { initState } from "./state";
 
 export function initMixin(Vue) {
   Vue.prototype._init = function (options) {
-    console.log(options);
     // 数据的劫持
     // this指向实例
     const vm = this;
