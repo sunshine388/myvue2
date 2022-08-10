@@ -22,21 +22,58 @@ export function complieToFuction(template) {
   let code = generate(ast);
 }
 
-// 开始标签
-function start(tagName, attrs) {
-  console.log("开始标签", tagName, attrs);
-}
-// 结束标签
-function end(tagName) {
-  console.log("结束标签", tagName);
-}
-// 文本标签
-function text(chars) {
-  console.log("文本", chars);
-}
-
 // 将模板内容编译为ast语法树
 function parserHTML(html) {
+  console.log("***** 进入 parserHTML：将模板编译成 AST 语法树 *****");
+  let stack = [];
+  let root = null;
+
+  function createASTElement(tag, attrs, parent) {
+    return {
+      tag, // 标签名
+      type: 1, // 元素类型为1
+      children: [], //儿子
+      parent,
+      attrs,
+    };
+  }
+  // 开始标签
+  function start(tag, attrs) {
+    console.log("开始标签", tag, attrs);
+    // 取栈中最后一个标签，作为父节点
+    let parent = stack[stack.length - 1];
+    // 创建当前 ast 节点
+    let element = createASTElement(tag, attrs, parent);
+    // 第一个作为根节点
+    if (root == null) root = element;
+    if (parent) {
+      element.parent = parent;
+      parent.children.push(element);
+    }
+    stack.push(element);
+  }
+  // 结束标签
+  function end(tagName) {
+    console.log("结束标签", tagName);
+    let endTag = stack.pop();
+    // check:抛出的结束标签名与当前结束标签名是否一直
+    // 开始/结束标签的特点是成对的，当抛出的元素名与当前元素名不一致是报错
+    if (endTag.tag != tagName) console.log("标签出错");
+  }
+  // 文本标签
+  function text(chars) {
+    console.log("文本", chars);
+    let parent = stack[stack.length - 1];
+    // 删除文本中可能存在的空白字符，将空格替换为空
+    chars = chars.replace(/\s/g, "");
+    if (chars) {
+      // 绑定父子关系
+      parent.children.push({
+        type: 2,
+        text: chars,
+      });
+    }
+  }
   /**
    * 截取字符串
    * @param {*} len 截取长度
@@ -118,8 +155,9 @@ function parserHTML(html) {
       advance(chars.length);
     }
   }
+  return root;
 }
 // 根据ast 语法树生成为 render 函数；
 function generate(ast) {
-  console.log("parserHTML-ast: " + ast);
+  console.log("parserHTML-ast: ", ast);
 }
