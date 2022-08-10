@@ -6,6 +6,9 @@
     <title>Document</title>
   </head>
   <body>
+    <div id="app" a="1" b="2">
+      <p>{{message}} <span>Hello Vue</span></p>
+    </div>
     <script src="/dist/vue.js"></script>
     <script>
       let vm = new Vue({
@@ -14,10 +17,6 @@
           return { name: "1", obj: { key: "val" }, arr: [] };
         },
       });
-      vm._data.arr.push({ key: "value" });
-      console.log(vm._data);
-      console.log(vm);
-      console.log(vm.name);
     </script>
   </body>
 </html>
