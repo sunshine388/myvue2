@@ -1,9 +1,26 @@
-import { isObject } from "../util";
+import { isObject, isArray, def } from "../util";
+import { arrayMethods } from "./array";
 
 class Observer {
   constructor(value) {
     // 如果value是对象，遍历对象中的属性，使用 Object.defineProperty 重新定义
-    this.walk(value); // 循环对象属性
+    // value._ob_ = this; // 给每一个监控过的对象都增加一个 _ob_ 属性，代表已经被监控过
+    def(value, "_ob_", this);
+    if (isArray(value)) {
+      // 如果是数组的劫持并不会对索引进行观测，因为会导致性能问题
+      // 前端开发很少操作索引，push，pop，shift，unshift
+
+      value.__proto__ = arrayMethods; // 更改数组的原型方法
+      // 如果是数组中有对象再对对象进行观测
+      this.observerArray(value);
+    } else {
+      this.walk(value); // 循环对象属性
+    }
+  }
+  observerArray(value) {
+    value.forEach((item, index) => {
+      observe(item);
+    });
   }
   // 循环 data 对象，使用 Object.keys 不循环原型方法
   walk(data) {
