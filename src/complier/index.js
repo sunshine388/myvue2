@@ -6,7 +6,9 @@ export function complieToFuction(template) {
   let ast = parserHTML(template);
   // 2，使用 AST 生成 render 函数
   let code = generate(ast);
-  console.log(code);
+  let render = new Function(`with(this){return ${code}}`);
+  console.log("包装 with 生成 render 函数：" + render.toString());
+  return render;
 }
 
 // 根据ast 语法树生成为 render 函数；
