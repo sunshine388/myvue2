@@ -7,8 +7,16 @@
 export function patch(el, vnode) {
   // 1.根据虚拟节点创建真实节点
   const elm = createElm(vnode);
-  // 2.使用真实节点替换虚拟节点
   console.log("生成的真实dom节点：", elm);
+  // 2.使用真实节点替换原来的老节点
+  const parentNode = el.parentNode;
+  // 找到老节点的下一个兄弟节点，（nextSiBling 若不存在将返回null)
+  const nextSibling = el.nextSibling;
+  // 将新节点elm插入到老节点el的下一个兄弟节点nextSIbling的前面
+  // 若nextSiBling为null，insertBefore等价与 appendChild
+  parentNode.insertBefore(elm, nextSibling);
+  // 删除老节点 el
+  parentNode.removeChild(el);
   return elm;
 }
 
