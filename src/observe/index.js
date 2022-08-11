@@ -1,5 +1,6 @@
 import { isObject, isArray, def } from "../util";
 import { arrayMethods } from "./array";
+import Dep from "./dep";
 
 class Observer {
   constructor(value) {
@@ -41,8 +42,15 @@ class Observer {
  */
 function defineReactive(obj, key, value) {
   observe(value); // 递归实现深层观测
+  let dep = new Dep();
   Object.defineProperty(obj, key, {
     get() {
+      // 视图渲染过程中，会触发数据的取值，如vm.name，进入get方法
+      // 如果get方法中的Dep.target有值，就让数据的 dep 记住渲染 watcher
+      console.log("取值操作");
+      if (Dep.target) {
+        dep.depend();
+      }
       // 闭包
       return value; // 问题：这里的 value 为什么不用 obj[key]获取？
     },
