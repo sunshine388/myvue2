@@ -1,5 +1,6 @@
 import { initState } from "./state";
 import { complieToFuction } from "./complier";
+import { mountComponent } from "./lifecycle";
 
 export function initMixin(Vue) {
   Vue.prototype._init = function (options) {
@@ -32,5 +33,8 @@ export function initMixin(Vue) {
       const render = complieToFuction(template);
       opts.render = render;
     }
+
+    // 将当前render渲染到el元素上
+    mountComponent(vm);
   };
 }
