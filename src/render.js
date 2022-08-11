@@ -4,7 +4,7 @@ import { createElement, createText } from "./vdom";
 export function renderMixin(Vue) {
   Vue.prototype._c = function (tag, data, ...childerns) {
     const vm = this;
-    return createElement(vm, tag, data, childerns);
+    return createElement(vm, tag, data, ...childerns);
   };
   Vue.prototype._v = function (text) {
     const vm = this;
