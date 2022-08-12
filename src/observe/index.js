@@ -59,6 +59,7 @@ function defineReactive(obj, key, value) {
       console.log("值发生变化了");
       observe(value); //继续劫持用户设置的值，因为用户设置的值可能是个对象
       value = newValue;
+      dep.notify(); // 通知当前 dep 中收集的所有 watcher 依次执行视图更新
     },
   });
 }
