@@ -19,3 +19,14 @@ function vnode(vm, tag, data, children, key, text) {
     text, // 文本
   };
 }
+
+/**
+ * 判断两个虚拟节点是否是同一个虚拟节点
+ *  逻辑：标签名 和 key 都相同
+ * @param {*} newVnode 新虚拟节点
+ * @param {*} oldVnode 老虚拟节点
+ * @returns
+ */
+export function isSameVnode(newVnode, oldVnode) {
+  return newVnode.tag === oldVnode.tag && newVnode.key === oldVnode.key;
+}
