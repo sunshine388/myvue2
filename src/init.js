@@ -1,6 +1,7 @@
 import { initState } from "./state";
 import { complieToFuction } from "./complier";
 import { mountComponent } from "./lifecycle";
+import { nextTick } from "./util";
 
 export function initMixin(Vue) {
   Vue.prototype._init = function (options) {
@@ -37,4 +38,5 @@ export function initMixin(Vue) {
     // 将当前render渲染到el元素上
     mountComponent(vm);
   };
+  Vue.prototype.$nextTick = nextTick;
 }
