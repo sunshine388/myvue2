@@ -24,19 +24,20 @@ export function patch(oldVnode, vnode) {
     return elm;
   } else {
     // 虚拟节点：做 diff 算法，新老节点比对
-    console.log(oldVnode, vnode);
+    console.log("新老节点对比", oldVnode, vnode);
     if (!isSameVnode(oldVnode, vnode)) {
       // 不是相同节点，不考虑复用直接替换
       return oldVnode.el.parentNode.replaceChild(createElm(vnode), oldVnode.el);
     } else {
-      let el = (vnode.el = vnode.el); // 节点复用：将老节点 el 赋值给新节点 el
+      let el = (vnode.el = oldVnode.el); // 节点复用：将老节点 el 赋值给新节点 el
       if (!oldVnode.tag) {
         // 文本，没有标签名
         if (oldVnode.text !== vnode.text) {
           el.textContent = vnode.text; // 新内容替换老内容
         }
       }
-      updateProperties(vnode);
+      // 元素的处理：相同节点，且新老节点不都是文本时
+      updateProperties(vnode, oldVnode.data);
 
       // 比较儿子节点...
       let oldChildren = oldVnode.children || [];
@@ -133,10 +134,8 @@ function updateChildren(el, oldChildren, newChildren) {
   function makeKeyByIndex(children) {
     let map = {};
     children.forEach((item, index) => {
-      map[item.key] = index;
+      item.key && (map[item.key] = index);
     });
-    console.log(map);
-    debugger;
     return map;
   }
 
@@ -151,15 +150,15 @@ function updateChildren(el, oldChildren, newChildren) {
     // 原因：节点之前被移走时置空，直接跳过
     if (!oldStartVnode) {
       oldStartVnode = oldChildren[++oldStartIndex];
-    } else if (oldEndVnode) {
+    } else if (!oldEndVnode) {
       oldEndVnode = oldChildren[--oldEndIndex];
-    } else if (isSameVnode(oldStartVnode.newStartVnode)) {
+    } else if (isSameVnode(oldStartVnode, newStartVnode)) {
       // isSameVnode只能判断标签和key一样，但属性可能还有不同
       // 所以需要patch方法递归更新新老虚拟节点的属性
       patch(oldStartVnode, newStartVnode);
       // 更新新老头指针和新老头节点
-      oldStartVnode = oldStartVnode[++oldStartIndex];
-      newStartVnode = newStartVnode[++newStartIndex];
+      oldStartVnode = oldChildren[++oldStartIndex];
+      newStartVnode = newChildren[++newStartIndex];
     } else if (isSameVnode(oldEndVnode, newEndVnode)) {
       patch(oldEndVnode, newEndVnode);
       oldEndVnode = oldChildren[--oldEndIndex];

@@ -29,8 +29,19 @@ export function mountComponent(vm) {
 export function lifeCycleMixin(Vue) {
   Vue.prototype._update = function (vnode) {
     const vm = this;
+    // 取上一次的preVnode
+    let preVnode = vm.preVnode;
+    // 渲染前，需要先保存当前vnode
+    vm.preVnode = vnode;
+    // preVnode有值，说明已经有节点了，本次是更新渲染，没值就是初渲染
     // 传入当前真实元素vm.$el，虚拟节点vnode，返回新的真实元素
-    vm.$el = patch(vm.$el, vnode);
+    if (!preVnode) {
+      // 传入当前真实元素vm.$el，虚拟节点vnode，返回新的真实元素
+      vm.$el = patch(vm.$el, vnode);
+    } else {
+      // 更新渲染:新老虚拟节点做 diff 比对
+      vm.$el = patch(preVnode, vnode);
+    }
   };
 }
 
