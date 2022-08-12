@@ -1,14 +1,15 @@
 import { initState } from "./state";
 import { complieToFuction } from "./complier";
 import { mountComponent } from "./lifecycle";
-import { nextTick } from "./util";
+import { mergeOptions, nextTick } from "./util";
 
 export function initMixin(Vue) {
   Vue.prototype._init = function (options) {
     // 数据的劫持
     // this指向实例
     const vm = this;
-    vm.$options = options; // vue中使用this.$options,指代的就是用户传递的属性
+     // 此时需使用 options 与 mixin 合并后的全局 options 再进行一次合并
+    vm.$options = mergeOptions(vm.constructor.options, options); // vue中使用this.$options,指代的就是用户传递的属性
 
     // 初始化状态，包括initProps、initMethod、initData、initComputed、initWatch等
     initState(vm);

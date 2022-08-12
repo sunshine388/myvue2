@@ -14,11 +14,29 @@
     </div>
     <script src="/dist/vue.js"></script>
     <script>
+      Vue.mixin({
+        beforeCreate() {
+          console.log("全局:mixin-beforeCreate 1");
+        },
+      });
+      Vue.mixin({
+        beforeCreate() {
+          console.log("全局:mixin-beforeCreate 2");
+        },
+      });
       let vm = new Vue({
         el: "#app",
         data() {
           return { name: "1", obj: { key: "val" }, arr: [] };
         },
+        beforeCreate: [
+          function () {
+            console.log("局部:new Vue-beforeCreate 1"); // A 模块初始化
+          },
+          function () {
+            console.log("局部:new Vue-beforeCreate 2"); // B 模块初始化
+          },
+        ],
       });
       vm.name = "2";
     </script>

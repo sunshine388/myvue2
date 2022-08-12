@@ -15,7 +15,7 @@ export function queueWatcher(watcher) {
     queue.push(watcher); // 缓存住watcher，后续统一处理
     if (!pending) {
       nextTick(flushschedulerQueue);
-      pendinhg = true; // 首次进入被置为 true，使微任务执行完成后宏任务才执行
+      pending = true; // 首次进入被置为 true，使微任务执行完成后宏任务才执行
     }
   }
 
@@ -27,5 +27,6 @@ export function queueWatcher(watcher) {
     queue = [];
     has = {};
     pending = false;
+    // 更新完成,执行生命周期：updated
   }
 }
