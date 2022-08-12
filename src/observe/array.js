@@ -13,7 +13,7 @@ methods.forEach((method) => {
     const result = oldArrayPrototype[method].apply(this, args); // 调用原生数组方法
 
     let inserted;
-    let ob = this._ob_;
+    let ob = this.__ob__;
     switch (method) {
       case "push":
       case "unshift":
@@ -25,6 +25,7 @@ methods.forEach((method) => {
         break;
     }
     if (inserted) ob.observerArray(inserted);
+    ob.dep.notify(); // 通过 ob 拿到 dep，调用 notify 触发 watcher 做视图更新
     return result;
   };
 });

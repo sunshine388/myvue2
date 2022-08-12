@@ -5,8 +5,8 @@ import Dep from "./dep";
 class Observer {
   constructor(value) {
     // 如果value是对象，遍历对象中的属性，使用 Object.defineProperty 重新定义
-    // value._ob_ = this; // 给每一个监控过的对象都增加一个 _ob_ 属性，代表已经被监控过
-    def(value, "_ob_", this);
+    // value.__ob__ = this; // 给每一个监控过的对象都增加一个 __ob__ 属性，代表已经被监控过
+    def(value, "__ob__", this);
     if (isArray(value)) {
       // 如果是数组的劫持并不会对索引进行观测，因为会导致性能问题
       // 前端开发很少操作索引，push，pop，shift，unshift
@@ -41,7 +41,8 @@ class Observer {
  * @param {*} value 给对象定义的属性值
  */
 function defineReactive(obj, key, value) {
-  observe(value); // 递归实现深层观测
+  // childOb 是数据组进行观测后返回的结果，内部 new Observe 只处理数组或对象类型
+  let childOb = observe(value); // 递归实现深层观测
   let dep = new Dep();
   Object.defineProperty(obj, key, {
     get() {
@@ -50,6 +51,16 @@ function defineReactive(obj, key, value) {
       console.log("取值操作");
       if (Dep.target) {
         dep.depend();
+        // 数组或对象本身的依赖收集
+        if (childOb) {
+          // 如果 childOb 有值，说明数据是数组或对象类型
+          // observe 方法中，会通过 new Observe 为数组或对象本身添加 dep 属性
+          childOb.dep.depend(); // 让数组和对象本身的 dep 记住当前 watcher
+          if (Array.isArray(value)) {
+            // 如果当前数据是数组类型
+            dependArray(value); // 可能数组中继续嵌套数组，需递归处理
+          }
+        }
       }
       // 闭包
       return value; // 问题：这里的 value 为什么不用 obj[key]获取？
@@ -71,4 +82,21 @@ export function observe(value) {
   }
   // 观测 value 对象，实现数据响应式
   return new Observer(value);
+}
+
+/**
+ * 使数组中的引用类型都进行依赖收集
+ * @param {*} value 需要做递归依赖收集的数组
+ */
+function dependArray(value) {
+  // 让数组里的引用类型都收集依赖
+  // 数组中如果有对象:[{}]或[[]]，也要做依赖收集（后续会为对象新增属性）
+  value.forEach((item) => {
+    let current = value[i]; // current 上如果有___ob___，说明是对象，就让 dep 收集依赖（只有对象上才有 ___ob___）
+    current.___ob___ && current.___ob___.dep.depend();
+    // 如果内部还是数组，继续递归处理
+    if (Array.isArray(current)) {
+      dependArray(current);
+    }
+  });
 }
