@@ -6,7 +6,7 @@
     <title>Document</title>
   </head>
   <body>
-    <div id="app" a="1" b="2" style="color: red; background: blue">
+    <div id="app" a="1" b="2" style="color: red">
       <p>
         aaa{{name}}
         <span>Hello Vue</span>
@@ -23,6 +23,10 @@
         beforeCreate() {
           console.log("全局:mixin-beforeCreate 2");
         },
+      });
+      Vue.component("my-button", {
+        name: "my-button",
+        template: "<button>全局组件</button>",
       });
       let vm = new Vue({
         el: "#app",
