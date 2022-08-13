@@ -11,6 +11,7 @@
         aaa{{name}}
         <span>Hello Vue</span>
       </p>
+      <my-button></my-button>
     </div>
     <script src="/dist/vue.js"></script>
     <script>
@@ -33,6 +34,12 @@
         data() {
           return { name: "1", obj: { key: "val" }, arr: [] };
         },
+        components: {
+          // 局部组件
+          "my-button": {
+            template: "<button>Hello Vue 局部组件</button>",
+          },
+        },
         beforeCreate: [
           function () {
             console.log("局部:new Vue-beforeCreate 1"); // A 模块初始化
@@ -45,6 +52,7 @@
       setTimeout(() => {
         vm.name = "2";
       }, 1000);
+      console.log(vm);
     </script>
   </body>
 </html>

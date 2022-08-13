@@ -37,12 +37,6 @@ export function nextTick(fn) {
   }
 }
 
-/**
- * 对象合并:将childVal合并到parentVal中
- * @param {*} parentVal   父值-老值
- * @param {*} childVal    子值-新值
- */
-
 let strats = {}; // 存放所有策略
 let lifeCycle = ["beforeCreate", "created", "beforeMount", "mounted"];
 lifeCycle.forEach((hook) => {
@@ -69,6 +63,20 @@ lifeCycle.forEach((hook) => {
   };
 });
 
+strats.component = function (parentVal, childVal) {
+  let res = Object.create(parentVal);
+  if (childVal) {
+    for (let key in childVal) {
+      res[key] = childCal[key];
+    }
+    return res;
+  }
+};
+/**
+ * 对象合并:将childVal合并到parentVal中
+ * @param {*} parentVal   父值-老值
+ * @param {*} childVal    子值-新值
+ */
 export function mergeOptions(parentVal, childVal) {
   let options = {};
   for (let key in parentVal) {

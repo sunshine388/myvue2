@@ -4,6 +4,11 @@ export function initGlobalAPI(Vue) {
   // 全局属性 options
   // 功能：存放mixins，component，filter、，directive属性
   Vue.options = {};
+  // 当组件初始化时，会使用 Vue.options 和组件 options 进行合并;
+  // 在这个过程中，_base 也会被合并到组件的 options 上;
+  // 之后所有的 vm.$options 就都可以取到 _base 即 Vue;
+  // 这样,在任何地方访问 vm.$options._base 都可以拿到 Vue;
+  Vue.options._base = Vue;
   Vue.options.components = {}; // 存放全局组件
 
   Vue.mixin = function (options) {
