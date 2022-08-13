@@ -20,9 +20,21 @@ function createComponent(vm, tag, data, children, key, Ctor) {
     // 获取 Vue 并通过 Vue.extend 将对象处理成为组件的构造函数
     Ctor = vm.$options._base.extend(Ctor);
   }
-
+  // 扩展组件的生命周期
+  data.hook = {
+    init() {
+      let child = new Ctor({});
+      child.$mount();
+    },
+    prepatch() {},
+    postpatch() {},
+  };
   // 创建 vnode 时,组件是没有文本的,需要传入 undefined
-  let componentVnode = vnode(vm, tag, data, children, key, undefined, {Ctor, children, tag});
+  let componentVnode = vnode(vm, tag, data, children, key, undefined, {
+    Ctor,
+    children,
+    tag,
+  });
   return componentVnode;
 }
 // 返回文本虚拟节点

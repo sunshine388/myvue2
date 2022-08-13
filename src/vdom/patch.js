@@ -65,6 +65,10 @@ function createElm(vnode) {
   let { tag, data, children, text, vm } = vnode;
   // 通过tag判断当前节点是元素还是文本
   if (typeof tag == "string") {
+    // 组件的处理
+    if (createElement(vnode)) {
+      // 将组件的虚拟节点，创建成为组件的真实节点
+    }
     vnode.el = document.createElement(tag);
     updateProperties(vnode, data);
     // 继续处理元素的儿子：递归创建真实节点并添加到对应的父亲上
@@ -236,5 +240,14 @@ function updateChildren(el, oldChildren, newChildren) {
       let child = oldChildren[i];
       child && el.removeChild(child.el);
     }
+  }
+}
+
+function createComponent(vnode) {
+  console.log(vnode);
+  let i = vnode.data;
+  if ((i = i.hook) && (i = i.init)) {
+    // 最后 i 为 init 方法
+    i(vnode); // 将 vnode 传入 init 方法
   }
 }
