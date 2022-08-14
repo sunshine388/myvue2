@@ -24,7 +24,7 @@ function createComponent(vm, tag, data, children, key, Ctor) {
   data.hook = {
     init(vnode) {
       // new Ctor()相当于执行new Vue.extend()，即相当于new Sub；则组件会将自己的配置与{ _isComponent: true }合并
-      let child = new Ctor({}); // 实例化组件
+      let child = (vnode.componentInstance = new Ctor({ _isComponent: true })); //实例化组件
       // 因为没有传入el属性，需要手动挂载，为了在组件实例上面增加$el方法可用于生成组件的真实渲染节点
       child.$mount(); // 组件挂载后会在vm上添加vm.$el 真实dom节点
     },

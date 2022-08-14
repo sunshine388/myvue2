@@ -11,7 +11,8 @@
         aaa{{name}}
         <span>Hello Vue</span>
       </p>
-      <my-button></my-button>
+      <my-button1></my-button1>
+      <my-button2></my-button2>
     </div>
     <script src="/dist/vue.js"></script>
     <script>
@@ -25,8 +26,8 @@
           console.log("全局:mixin-beforeCreate 2");
         },
       });
-      Vue.component("my-button", {
-        name: "my-button",
+      Vue.component("my-button1", {
+        name: "my-button1",
         template: "<button>全局组件</button>",
       });
       let vm = new Vue({
@@ -36,8 +37,11 @@
         },
         components: {
           // 局部组件
-          "my-button": {
-            template: "<button>Hello Vue 局部组件</button>",
+          "my-button2": {
+            template: "<button>{{name}}局部组件</button>",
+            data() {
+              return { name: "hello" };
+            },
           },
         },
         beforeCreate: [

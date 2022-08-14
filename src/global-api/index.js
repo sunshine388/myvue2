@@ -33,6 +33,7 @@ export function initGlobalAPI(Vue) {
     Sub.prototype = Object.create(Super.prototype);
     // 修复 constructor 指向问题：Object.create 会产生一个新的实例作为子类的原型，导致constructor指向错误
     Sub.prototype.constructor = Sub;
+    Sub.options = mergeOptions(this.options, definition); //合并自己的options和父类的options
     return Sub;
   };
 

@@ -1,4 +1,4 @@
-import { isSameVnode } from "./index";
+import { isReservedTag, isSameVnode } from "./index";
 
 /**
  * 将虚拟节点转为真实节点后插入到元素中
@@ -7,56 +7,67 @@ import { isSameVnode } from "./index";
  * @returns         新的真实元素
  */
 export function patch(oldVnode, vnode) {
-  const isRealElement = oldVnode.nodeType;
-  if (isRealElement) {
-    // 1.根据虚拟节点创建真实节点
-    const elm = createElm(vnode);
-    console.log("生成的真实dom节点：", elm);
-    // 2.使用真实节点替换原来的老节点
-    const parentNode = oldVnode.parentNode;
-    // 找到老节点的下一个兄弟节点，（nextSiBling 若不存在将返回null)
-    const nextSibling = oldVnode.nextSibling;
-    // 将新节点elm插入到老节点el的下一个兄弟节点nextSIbling的前面
-    // 若nextSiBling为null，insertBefore等价与 appendChild
-    parentNode.insertBefore(elm, nextSibling);
-    // 删除老节点 oldVnode
-    parentNode.removeChild(oldVnode);
-    return elm;
+  if (!oldVnode) {
+    // 组件的创建过程是没有el属性的
+    return createElm(vnode);
   } else {
-    // 虚拟节点：做 diff 算法，新老节点比对
-    console.log("新老节点对比", oldVnode, vnode);
-    if (!isSameVnode(oldVnode, vnode)) {
-      // 不是相同节点，不考虑复用直接替换
-      return oldVnode.el.parentNode.replaceChild(createElm(vnode), oldVnode.el);
+    const isRealElement = oldVnode.nodeType;
+    if (isRealElement) {
+      // 1.根据虚拟节点创建真实节点
+      const elm = createElm(vnode);
+      console.log("生成的真实dom节点：", elm);
+      // 2.使用真实节点替换原来的老节点
+      const parentNode = oldVnode.parentNode;
+      // 找到老节点的下一个兄弟节点，（nextSiBling 若不存在将返回null)
+      const nextSibling = oldVnode.nextSibling;
+      // 将新节点elm插入到老节点el的下一个兄弟节点nextSIbling的前面
+      // 若nextSiBling为null，insertBefore等价与 appendChild
+      parentNode.insertBefore(elm, nextSibling);
+      // 删除老节点 oldVnode
+      parentNode.removeChild(oldVnode);
+      return elm;
     } else {
-      let el = (vnode.el = oldVnode.el); // 节点复用：将老节点 el 赋值给新节点 el
-      if (!oldVnode.tag) {
-        // 文本，没有标签名
-        if (oldVnode.text !== vnode.text) {
-          el.textContent = vnode.text; // 新内容替换老内容
-        }
-      }
-      // 元素的处理：相同节点，且新老节点不都是文本时
-      updateProperties(vnode, oldVnode.data);
-
-      // 比较儿子节点...
-      let oldChildren = oldVnode.children || [];
-      let newChildren = vnode.children || [];
-      // 情况 1：老的有儿子，新的没有儿子；直接将多余的老 dom 元素删除即可；
-      if (oldChildren.length > 0 && newChildren.length == 0) {
-        // 更好的处理：由于子节点中可能包含组件，需要封装removeChildNodes方法，将子节点全部删掉
-        el.innerHTML = ""; // 暴力写法直接清空；
-      } else if (oldChildren.length == 0 && newChildren.length > 0) {
-        newChildren.forEach((child) => {
-          // 注意：这里的child是虚拟节点，需要变为真实节点
-          let childElm = createElm(child); // 根据新的虚拟节点，创建一个真实节点
-          el.appendChild(childElm); // 将生成的真实节点，放入 dom
-        });
+      // 虚拟节点：做 diff 算法，新老节点比对
+      console.log("新老节点对比", oldVnode, vnode);
+      if (!isSameVnode(oldVnode, vnode)) {
+        // 不是相同节点，不考虑复用直接替换
+        return oldVnode.el.parentNode.replaceChild(
+          createElm(vnode),
+          oldVnode.el
+        );
       } else {
-        // diff 比对的核心逻辑
-        updateChildren(el, oldChildren, newChildren);
+        if (!isReservedTag(oldVnode.tag) && oldVnode.componentInstance) {
+          oldVnode.el = oldVnode.componentInstance.$el;
+        }
+        let el = (vnode.el = oldVnode.el); // 节点复用：将老节点 el 赋值给新节点 el
+        if (!oldVnode.tag) {
+          // 文本，没有标签名
+          if (oldVnode.text !== vnode.text) {
+            el.textContent = vnode.text; // 新内容替换老内容
+          }
+        }
+        // 元素的处理：相同节点，且新老节点不都是文本时
+        updateProperties(vnode, oldVnode.data);
+
+        // 比较儿子节点...
+        let oldChildren = oldVnode.children || [];
+        let newChildren = vnode.children || [];
+        // 情况 1：老的有儿子，新的没有儿子；直接将多余的老 dom 元素删除即可；
+        if (oldChildren.length > 0 && newChildren.length == 0) {
+          // 更好的处理：由于子节点中可能包含组件，需要封装removeChildNodes方法，将子节点全部删掉
+          el.innerHTML = ""; // 暴力写法直接清空；
+        } else if (oldChildren.length == 0 && newChildren.length > 0) {
+          newChildren.forEach((child) => {
+            // 注意：这里的child是虚拟节点，需要变为真实节点
+            let childElm = createElm(child); // 根据新的虚拟节点，创建一个真实节点
+            el.appendChild(childElm); // 将生成的真实节点，放入 dom
+          });
+        } else {
+          // diff 比对的核心逻辑
+          updateChildren(el, oldChildren, newChildren);
+        }
+        return el;
       }
-      return el;
     }
   }
 }
@@ -68,6 +79,7 @@ function createElm(vnode) {
     // 组件的处理
     if (createComponent(vnode)) {
       // 将组件的虚拟节点，创建成为组件的真实节点
+      return vnode.componentInstance.$el;
     }
     vnode.el = document.createElement(tag);
     updateProperties(vnode, data);
@@ -244,10 +256,13 @@ function updateChildren(el, oldChildren, newChildren) {
 }
 
 function createComponent(vnode) {
-  console.log(vnode);
   let i = vnode.data;
   if ((i = i.hook) && (i = i.init)) {
     // 最后 i 为 init 方法
     i(vnode); // 将 vnode 传入 init 方法
+  }
+  // 如果组件实例化完毕有componentInstance属性 那证明是组件
+  if (vnode.componentInstance) {
+    return true;
   }
 }
