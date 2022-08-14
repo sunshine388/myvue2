@@ -4,21 +4,18 @@ import { patch } from "./vdom/patch";
 export function mountComponent(vm) {
   // vm._render()：调用 render 方法
   // vm._update：将虚拟节点更新到页面上
+  callHook(vm, "beforeMount");
   let updateComponent = () => {
     vm._update(vm._render());
   };
-
-  // 当视图渲染前，调用钩子：beforeCreate
-  callHook(vm, "beforeCreate");
 
   // 渲染watcher，每个组件都有一个watcher
   new Watcher(
     vm,
     updateComponent,
     () => {
-      console.log("Watcher - update");
-      // 视图更新后，调用钩子：created
-      callHook(vm, "created");
+      console.log("视图更新了");
+      callHook(vm, "beforeUpdate");
     },
     true
   );

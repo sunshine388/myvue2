@@ -66,7 +66,7 @@ function createElm(vnode) {
   // 通过tag判断当前节点是元素还是文本
   if (typeof tag == "string") {
     // 组件的处理
-    if (createElement(vnode)) {
+    if (createComponent(vnode)) {
       // 将组件的虚拟节点，创建成为组件的真实节点
     }
     vnode.el = document.createElement(tag);

@@ -38,7 +38,16 @@ export function nextTick(fn) {
 }
 
 let strats = {}; // 存放所有策略
-let lifeCycle = ["beforeCreate", "created", "beforeMount", "mounted"];
+let lifeCycle = [
+  "beforeCreate",
+  "created",
+  "beforeMount",
+  "mounted",
+  "beforeUpdate",
+  "updated",
+  "beforeDestroy",
+  "destroyed",
+];
 lifeCycle.forEach((hook) => {
   // 创建生命周期的合并策略
   strats[hook] = function (parentVal, childVal) {
@@ -63,14 +72,14 @@ lifeCycle.forEach((hook) => {
   };
 });
 
-strats.component = function (parentVal, childVal) {
+strats.components = function (parentVal, childVal) {
   let res = Object.create(parentVal);
   if (childVal) {
     for (let key in childVal) {
-      res[key] = childCal[key];
+      res[key] = childVal[key];
     }
-    return res;
   }
+  return res;
 };
 /**
  * 对象合并:将childVal合并到parentVal中

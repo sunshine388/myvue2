@@ -42,7 +42,7 @@ export function initGlobalAPI(Vue) {
    * @param {*} definition  组件定义
    */
   Vue.component = function (id, definition) {
-    definition.name = definition.name || id;
+    const name = definition.name || id;
     // 如果传入的definition是对象
     if (isObject(definition)) {
       definition = Vue.extend(definition);
