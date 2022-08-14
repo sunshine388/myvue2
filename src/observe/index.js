@@ -80,6 +80,10 @@ export function observe(value) {
   if (!isObject(value)) {
     return;
   }
+  // 如果已经是响应式的数据，直接return
+  if (value.__ob__) {
+    return;
+  }
   // 观测 value 对象，实现数据响应式
   return new Observer(value);
 }
@@ -92,8 +96,8 @@ function dependArray(value) {
   // 让数组里的引用类型都收集依赖
   // 数组中如果有对象:[{}]或[[]]，也要做依赖收集（后续会为对象新增属性）
   value.forEach((item) => {
-    let current = value[i]; // current 上如果有___ob___，说明是对象，就让 dep 收集依赖（只有对象上才有 ___ob___）
-    current.___ob___ && current.___ob___.dep.depend();
+    let current = value[i]; // current 上如果有__ob__，说明是对象，就让 dep 收集依赖（只有对象上才有 __ob__）
+    current.__ob__ && current.__ob__.dep.depend();
     // 如果内部还是数组，继续递归处理
     if (Array.isArray(current)) {
       dependArray(current);

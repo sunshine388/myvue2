@@ -7,9 +7,10 @@ class Dep {
   // 让 watcher 记住 dep（查重），再让 dep 记住 watcher
   depend() {
     // this.subs.push(Dep.target);
-
-    // 相当于 watcher.addDep：使当前 watcher 记住 dep
-    Dep.target.addDep(this);
+    if (Dep.target) {
+      // 相当于 watcher.addDep：使当前 watcher 记住 dep
+      Dep.target.addDep(this);
+    }
   }
   addSub(watcher) {
     this.subs.push(watcher);

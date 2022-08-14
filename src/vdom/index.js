@@ -22,9 +22,11 @@ function createComponent(vm, tag, data, children, key, Ctor) {
   }
   // 扩展组件的生命周期
   data.hook = {
-    init() {
-      let child = new Ctor({});
-      child.$mount();
+    init(vnode) {
+      // new Ctor()相当于执行new Vue.extend()，即相当于new Sub；则组件会将自己的配置与{ _isComponent: true }合并
+      let child = new Ctor({}); // 实例化组件
+      // 因为没有传入el属性，需要手动挂载，为了在组件实例上面增加$el方法可用于生成组件的真实渲染节点
+      child.$mount(); // 组件挂载后会在vm上添加vm.$el 真实dom节点
     },
     prepatch() {},
     postpatch() {},
@@ -76,7 +78,7 @@ function makeMap(str) {
 // 原始标签
 export const isReservedTag = makeMap(
   "template,script,style,element,content,slot,link,meta,svg,view,button," +
-    "a,div,img,image,text,span,input,switch,textarea,spinner,select," +
+    "a,p,div,img,image,text,span,input,switch,textarea,spinner,select," +
     "slider,slider-neighbor,indicator,canvas," +
     "list,cell,header,loading,loading-indicator,refresh,scrollable,scroller," +
     "video,web,embed,tabbar,tabheader,datepicker,timepicker,marquee,countdown"

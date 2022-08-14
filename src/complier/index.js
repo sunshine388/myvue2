@@ -16,14 +16,14 @@ function generate(ast) {
   console.log("parserHTML-ast: ", ast);
   let children = genChildren(ast); // 递归深层处理儿子
   let code = `_c('${ast.tag}',${
-    ast.attrs.length ? getProps(ast.attrs) : "undefined"
+    ast.attrs.length ? genProps(ast.attrs) : "undefined"
   }${ast.children ? `,${children}` : ""})`;
 
   return code;
 }
 
 // 将attrs数组格式化为：{key=val,key=val}
-function getProps(attrs) {
+function genProps(attrs) {
   let str = "";
   attrs.forEach((attr) => {
     // 将样式处理为对象 {name: id, value: 'app'}
